@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "70480808986",
+    "firebase_url": "https://dormitorymanagementsyste-c977a.firebaseio.com",
+    "project_id": "dormitorymanagementsyste-c977a",
+    "storage_bucket": "dormitorymanagementsyste-c977a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:70480808986:android:ab062c07417f98722ed5a3",
+        "android_client_info": {
+          "package_name": "com.example.dormitorymanagementsystem"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "70480808986-f5sugarl5efjorm1c96c7196dpso711g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCbcWm-dlufzwZiUYtDMCV65yKybQkZr-s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "70480808986-f5sugarl5efjorm1c96c7196dpso711g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

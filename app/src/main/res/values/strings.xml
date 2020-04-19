@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">DormitoryManagementSystem</string>
+
+    <array name="Roles">
+        <item>Occupant</item>
+        <item>Admin</item>
+    </array>
+
+    <array name="Gender">
+        <item>Select Gender</item>
+        <item>Male</item>
+        <item>Female</item>
+    </array>
+
+    <string name="title_activity_occupant_main">OccupantMain</string>
+    <string name="occupant_tab_1">Personal Info</string>
+    <string name="occupant_tab_2">Account</string>
+    <string name="title_activity_admin_main">adminMain</string>
+    <string name="admin_tab_1">Rooms</string>
+    <string name="admin_tab_2">Clients</string>
+</resources>

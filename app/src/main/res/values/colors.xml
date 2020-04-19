@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#5d9de3</color>
+    <color name="colorPrimaryDark">#5d9de3</color>
+    <color name="colorAccent">#FF9472</color>
+    <color name="colorAccentTransparent">#88FF9472</color>
+    <color name="progressBarColor">#7300ff</color>
+    <color name="black">#000000</color>
+    <color name="inactive_text">#878787</color>
+    <color name="available">#26a80d</color>
+    <color name="backupPrimaryDark">#2d87eb</color>
+    <color name="disabledBG">#77bfbfbf</color>
+    <color name="white">#ffffff</color>
+</resources>
