@@ -8,7 +8,10 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.5.3'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.4'
         classpath 'com.google.gms:google-services:4.3.3'
+
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
 
@@ -20,6 +23,14 @@ allprojects {
         google()
         jcenter()
         
+    }
+    ext {
+        compileSdkVersion = 23
+        buildToolsVersion = '26.0.2'
+        minSdkVersion = 16
+        targetSdkVersion = 23
+        versionCode = 24
+        versionName = '0.6.6'
     }
 }
 

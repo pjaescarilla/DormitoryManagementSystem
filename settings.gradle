@@ -1,2 +1,2 @@
-include ':app'
+include ':app', ':paymaya_checkout'
 rootProject.name='DormitoryManagementSystem'
