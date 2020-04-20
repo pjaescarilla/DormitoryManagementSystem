@@ -145,12 +145,14 @@ public class BillingFragment extends Fragment implements PayMayaCheckoutCallback
         billingInfoTable.child(((DormVars)getActivity().getApplication()).getActiveProfile().getUsername()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                thisProfilesBill = dataSnapshot.getValue(Bill.class);
-                textViewAmtDue.setText("PHP "+Double.toString(thisProfilesBill.getBalance()));
-                textViewContractLength.setText(Integer.toString(thisProfilesBill.getContractLengthMo())+" months");
-                textViewDueDate.setText(thisProfilesBill.getDueDate());
-                textViewMonthlyDue.setText("PHP "+Double.toString(thisProfilesBill.getMonthlyDue()));
-                textViewPaymentSched.setText("every "+thisProfilesBill.getPaymentSched()+" of the month");
+                if (dataSnapshot.getChildrenCount()!=0) {
+                    thisProfilesBill = dataSnapshot.getValue(Bill.class);
+                    textViewAmtDue.setText("PHP " + Double.toString(thisProfilesBill.getBalance()));
+                    textViewContractLength.setText(Integer.toString(thisProfilesBill.getContractLengthMo()) + " months");
+                    textViewDueDate.setText(thisProfilesBill.getDueDate());
+                    textViewMonthlyDue.setText("PHP " + Double.toString(thisProfilesBill.getMonthlyDue()));
+                    textViewPaymentSched.setText("every " + thisProfilesBill.getPaymentSched() + " of the month");
+                }
             }
 
             @Override
