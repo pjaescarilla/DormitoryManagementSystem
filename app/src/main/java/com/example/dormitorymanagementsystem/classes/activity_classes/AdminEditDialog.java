@@ -67,7 +67,7 @@ public class AdminEditDialog extends AppCompatDialogFragment {
 
     // Billing variables
     private EditText editTextAmountDue;
-    private TextView textViewDueDate, textViewBillingEdit, textViewBillingSave;
+    private TextView textViewDueDate, textViewBillingEdit, textViewBillingSave, textViewTransHistory;
 
     // Database variables
     private DatabaseReference profilesTable, billingsTable, roomsTable, transactionsTable;
@@ -81,6 +81,7 @@ public class AdminEditDialog extends AppCompatDialogFragment {
     private Bill thisProfilesBill;
     private TextView dateToChange, textViewDeleteUser;
     private EditText editTextDefault;
+    private TransactionHistoryDialog reg = new TransactionHistoryDialog();
     private AdminEditDialogListener listener;
 
     @Override
@@ -167,6 +168,15 @@ public class AdminEditDialog extends AppCompatDialogFragment {
                 billingsTable.child(selectedProfile.getUsername()).setValue(thisProfilesBill);
             }
         });
+
+        textViewTransHistory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((DormVars)getActivity().getApplication()).setTransactionToSee(selectedProfile);
+                reg.show(getChildFragmentManager(),"TransHistoryFromAdmin");
+            }
+        });
+
 
         textViewRoomAssignEdit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -387,6 +397,7 @@ public class AdminEditDialog extends AppCompatDialogFragment {
         textViewDueDate = thisView.findViewById(R.id.adminEditDueDate);
         textViewBillingEdit = thisView.findViewById(R.id.adminEditButtonBilling);
         textViewBillingSave = thisView.findViewById(R.id.adminEditBillingSave);
+        textViewTransHistory = thisView.findViewById(R.id.adminEditTransactionHistory);
 
         // General variables
         profilesTable = FirebaseDatabase.getInstance().getReference("Profiles");
@@ -524,7 +535,12 @@ public class AdminEditDialog extends AppCompatDialogFragment {
 
                     // Billing
                     editTextAmountDue.setText(Double.toString(thisProfilesBill.getBalance()));
-                    textViewDueDate.setText(thisProfilesBill.getDueDate());
+                    if (thisProfilesBill.getDueDate()==null || thisProfilesBill.getDueDate().isEmpty()) {
+                        textViewDueDate.setText("Select Date");
+                    }
+                    else {
+                        textViewDueDate.setText(thisProfilesBill.getDueDate());
+                    }
                 }
             }
 

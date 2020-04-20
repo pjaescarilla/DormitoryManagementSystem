@@ -46,7 +46,7 @@ public class BillingFragment extends Fragment implements PayMayaCheckoutCallback
     // View Variables
     private View thisView;
     private Button buttonPay;
-    private TextView textViewPaymentSched, textViewMonthlyDue, textViewContractLength, textViewAmtDue, textViewDueDate;
+    private TextView textViewPaymentSched, textViewMonthlyDue, textViewContractLength, textViewAmtDue, textViewDueDate, textViewTransHistory;
     private EditText editTextPayAmount, editTextRemarks;
 
     // Database Variables
@@ -56,11 +56,12 @@ public class BillingFragment extends Fragment implements PayMayaCheckoutCallback
     private static final String PUBLIC_FACING_API_KEY = "pk-eo4sL393CWU5KmveJUaW8V730TTei2zY8zE4dHJDxkF";
     private PayMayaCheckout mPayMayaCheckout;
     private String requestReference;
+    private paymayaCustomListener listener;
 
     // Other Variables
     private Bill thisProfilesBill;
     private Profile thisProfile;
-    private paymayaCustomListener listener;
+    private TransactionHistoryDialog reg = new TransactionHistoryDialog();
 
 
     // OVERRIDE METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -82,6 +83,14 @@ public class BillingFragment extends Fragment implements PayMayaCheckoutCallback
                     //executePaymayaCheckout();
                     listener.executePaymayaCheckout(((DormVars)getActivity().getApplication()).getActiveProfile(),editTextPayAmount.getText().toString(),editTextRemarks.getText().toString(),requestReference);
                 }
+            }
+        });
+
+        textViewTransHistory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((DormVars)getActivity().getApplication()).setTransactionToSee(((DormVars)getActivity().getApplication()).getActiveProfile());
+                reg.show(getChildFragmentManager(),"TransactionHistoryFromBilling");
             }
         });
 
@@ -121,6 +130,7 @@ public class BillingFragment extends Fragment implements PayMayaCheckoutCallback
         textViewDueDate = thisView.findViewById(R.id.accountDueDate);
         textViewMonthlyDue = thisView.findViewById(R.id.accountMonthlyDue);
         textViewPaymentSched = thisView.findViewById(R.id.accountPdate);
+        textViewTransHistory = thisView.findViewById(R.id.accountTransHistory);
         editTextPayAmount = thisView.findViewById(R.id.accountPayAmount);
         editTextRemarks = thisView.findViewById(R.id.accountRemarks);
 

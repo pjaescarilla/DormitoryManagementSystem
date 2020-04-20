@@ -31,11 +31,6 @@ public class AdminMain extends AppCompatActivity implements AdminEditDialog.Admi
     }
 
     @Override
-    public void onBackPressed() {
-        // Do nothing
-    }
-
-    @Override
     public void closeAdminEditDialog() {
         sectionsPagerAdapter.getThisClientFragment().closeDialog();
     }

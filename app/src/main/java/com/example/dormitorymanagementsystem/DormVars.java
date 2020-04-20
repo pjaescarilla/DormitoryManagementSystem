@@ -27,6 +27,7 @@ import java.util.List;
 
 public class DormVars extends Application {
     private Profile activeProfile = null;
+    private Profile transactionToSee = null;
     private Profile adminSelectedProfile = new Profile("TestRun","test@gmail.com","Occupant");
     private Bill billToUpdate = null;
     private Transaction transactionToAdd = null;
@@ -61,5 +62,13 @@ public class DormVars extends Application {
 
     public void setTransactionToAdd(Transaction transactionToAdd) {
         this.transactionToAdd = transactionToAdd;
+    }
+
+    public Profile getTransactionToSee() {
+        return transactionToSee;
+    }
+
+    public void setTransactionToSee(Profile transactionToSee) {
+        this.transactionToSee = transactionToSee;
     }
 }

@@ -74,10 +74,6 @@ public class OccupantMain extends AppCompatActivity implements UserDetailsEntryD
         reg.dismiss();
     }
 
-    @Override
-    public void onBackPressed() {
-        // do nothing
-    }
 
 
 
