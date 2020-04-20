@@ -1,6 +1,9 @@
 package com.example.dormitorymanagementsystem.classes.activity_classes;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +19,7 @@ import androidx.fragment.app.Fragment;
 import com.example.dormitorymanagementsystem.DormVars;
 import com.example.dormitorymanagementsystem.R;
 import com.example.dormitorymanagementsystem.classes.oop_classes.Bill;
+import com.example.dormitorymanagementsystem.classes.oop_classes.Profile;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -51,9 +55,12 @@ public class BillingFragment extends Fragment implements PayMayaCheckoutCallback
     // Paymaya Variables
     private static final String PUBLIC_FACING_API_KEY = "pk-eo4sL393CWU5KmveJUaW8V730TTei2zY8zE4dHJDxkF";
     private PayMayaCheckout mPayMayaCheckout;
+    private String requestReference;
 
     // Other Variables
     private Bill thisProfilesBill;
+    private Profile thisProfile;
+    private paymayaCustomListener listener;
 
 
     // OVERRIDE METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -61,18 +68,24 @@ public class BillingFragment extends Fragment implements PayMayaCheckoutCallback
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         thisView = inflater.inflate(R.layout.fragment_billing,container,false);
+        PayMayaConfig.setEnvironment(PayMayaConfig.ENVIRONMENT_SANDBOX);
+        mPayMayaCheckout = new PayMayaCheckout(PUBLIC_FACING_API_KEY,this);
 
         initializeVariables();
         populateFields();
 
-        //buttonPay.setOnClickListener(new View.OnClickListener() {
-        //    @Override
-        //    public void onClick(View v) {
-        //        recordTransaction();
-        //    }
-        //});
+        buttonPay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (paymentFieldsValidated()) {
+                    updateBalanceValues();
+                    //executePaymayaCheckout();
+                    listener.executePaymayaCheckout(((DormVars)getActivity().getApplication()).getActiveProfile(),editTextPayAmount.getText().toString(),editTextRemarks.getText().toString(),requestReference);
+                }
+            }
+        });
 
-        testPaymaya();
+        //testPaymaya();
 
         return thisView;
     }
@@ -92,6 +105,12 @@ public class BillingFragment extends Fragment implements PayMayaCheckoutCallback
         Toast.makeText(getContext(), "Payment Failed", Toast.LENGTH_LONG).show();
     }
 
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        listener = (paymayaCustomListener) context;
+    }
+
     // METHODS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     private void initializeVariables()
@@ -107,18 +126,9 @@ public class BillingFragment extends Fragment implements PayMayaCheckoutCallback
 
         billingInfoTable = FirebaseDatabase.getInstance().getReference("BillingInfo");
         transactionsTable = FirebaseDatabase.getInstance().getReference("Transactions");
+        thisProfile=((DormVars)getActivity().getApplication()).getActiveProfile();
     }
 
-    private void fillUpDummyData() {
-        buttonPay=thisView.findViewById(R.id.accountPayButton);
-        buttonPay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Bill newBillingFo = new Bill (36,12000.98,23000,"3/2/2020","every 4th");
-                FirebaseDatabase.getInstance().getReference("BillingInfo").child(((DormVars)getActivity().getApplication()).getActiveProfile().getUsername()).setValue(newBillingFo);
-            }
-        });
-    }
 
     private void populateFields()
     {
@@ -157,67 +167,67 @@ public class BillingFragment extends Fragment implements PayMayaCheckoutCallback
     }
 
     private void recordTransaction() {
-        if (paymentFieldsValidated()) {
             double previousBalance = thisProfilesBill.getBalance();
             double change = new BigDecimal(Double.parseDouble(editTextPayAmount.getText().toString())).setScale(2, RoundingMode.HALF_UP).doubleValue() * -1;
             double newBalance = new BigDecimal(previousBalance + change).setScale(2, RoundingMode.HALF_UP).doubleValue();
             Transaction newTransaction = new Transaction(newBalance, change);
             newTransaction.setChangeOwner(((DormVars) getActivity().getApplication()).getActiveProfile().getUsername());
             newTransaction.setTransDate(newTransaction.extractDateTimeNow());
-            String referenceNo = newTransaction.generateReferenceNumber();
-            transactionsTable.child(((DormVars) getActivity().getApplication()).getActiveProfile().getUsername()).child(referenceNo).setValue(newTransaction);
+            //String referenceNo = newTransaction.generateReferenceNumber();
+            transactionsTable.child(((DormVars) getActivity().getApplication()).getActiveProfile().getUsername()).child(requestReference).setValue(newTransaction);
 
             thisProfilesBill.setBalance(newBalance);
             billingInfoTable.child(((DormVars)getActivity().getApplication()).getActiveProfile().getUsername()).setValue(thisProfilesBill);
-        }
     }
 
-    private void testPaymaya() {
-        PayMayaConfig.setEnvironment(PayMayaConfig.ENVIRONMENT_SANDBOX);
-        mPayMayaCheckout = new PayMayaCheckout(PUBLIC_FACING_API_KEY, this);
-        Contact contact = new Contact("09051233249", "supbish22@gmail.com");
+    private void updateBalanceValues() {
+        double previousBalance = thisProfilesBill.getBalance();
+        double change = new BigDecimal(Double.parseDouble(editTextPayAmount.getText().toString())).setScale(2, RoundingMode.HALF_UP).doubleValue() * -1;
+        double newBalance = new BigDecimal(previousBalance + change).setScale(2, RoundingMode.HALF_UP).doubleValue();
+        Transaction newTransaction = new Transaction(newBalance, change);
+        newTransaction.setChangeOwner(((DormVars) getActivity().getApplication()).getActiveProfile().getUsername());
+        newTransaction.setTransDate(newTransaction.extractDateTimeNow());
+        requestReference = newTransaction.generateReferenceNumber();
+        //transactionsTable.child(((DormVars) getActivity().getApplication()).getActiveProfile().getUsername()).child(requestReference).setValue(newTransaction);
+        ((DormVars)getActivity().getApplication()).setTransactionToAdd(newTransaction);
+
+        thisProfilesBill.setBalance(newBalance);
+        //billingInfoTable.child(((DormVars)getActivity().getApplication()).getActiveProfile().getUsername()).setValue(thisProfilesBill);
+        ((DormVars)getActivity().getApplication()).setBillToUpdate(thisProfilesBill);
+    }
+
+    private void executePaymayaCheckout() {
+        // SHIPPING DETAILS
+        Contact contact = new Contact("09051233249", thisProfile.getEmail());
         Address address = new Address("line 1", "line 2", "city", "state", "zip code", "PH");
-        Buyer buyer = new Buyer("First name", "Middle name", "Last name");
+        Buyer buyer = new Buyer(thisProfile.getFirstName(),thisProfile.getMiddleName(),thisProfile.getLastName());
         buyer.setContact(contact);
         buyer.setBillingAddress(address);
         buyer.setShippingAddress(address);
 
-        BigDecimal summaryTotal = BigDecimal.valueOf(0);
-        List itemsList = new ArrayList<>();
-        String currency = "PHP";
+        // COST DETAILS
+        BigDecimal amountToPay = new BigDecimal(Double.parseDouble(editTextPayAmount.getText().toString())).setScale(2,RoundingMode.HALF_UP);
+        TotalAmount totalAmount = new TotalAmount(amountToPay,"PHP");
+        List paymentDetailsList = new ArrayList<>();
+        Item paymentDetails = new Item(editTextRemarks.getText().toString(),1,totalAmount);
+        paymentDetailsList.add(paymentDetails);
 
-        BigDecimal item1Amount = BigDecimal.valueOf(100);
-        summaryTotal.add(item1Amount);
-        TotalAmount totalAmount = new TotalAmount(item1Amount, currency);
-        int quantity = 10;
-        Item item1 = new Item("Item 1 name", quantity, totalAmount);
-        item1.setSkuCode("SKU code");
-        item1.setDescription("bag");
-        itemsList.add(item1);
-
-        BigDecimal item2Amount = BigDecimal.valueOf(200);
-        summaryTotal.add(item2Amount);
-        totalAmount = new TotalAmount(item2Amount, currency);
-        quantity = 20;
-        Item item2 = new Item("Item 2 name", quantity, totalAmount);
-        item2.setSkuCode("SKU code");
-        item2.setDescription("shoes");
-        itemsList.add(item2);
-
+        // Thank you pages
         String successURL = "http://yourshop.com/success";
         String failedURL = "http://yourshop.com/failed";
         String canceledURL = "http://yourshop.com/canceled";
-
         RedirectUrl redirectUrl = new RedirectUrl(successURL, failedURL, canceledURL);
 
-        String requestReference = "asdfsdr1234asdfwe";
-        final Checkout checkout = new Checkout(totalAmount,buyer,itemsList,requestReference,redirectUrl);
+        // Execution of payment
+        requestReference = new Transaction().generateReferenceNumber();
+        Checkout checkout = new Checkout(totalAmount,buyer,paymentDetailsList,requestReference,redirectUrl);
+        mPayMayaCheckout.execute(getActivity(),checkout);
+    }
 
-        buttonPay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mPayMayaCheckout.execute(getActivity(),checkout);
-            }
-        });
+
+    // PAYMAYA CUSTOM CALLBACK BY PEJEY ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    public interface paymayaCustomListener {
+        void executePaymayaCheckout(Profile thisProfile, String payAmount, String remarks, String requestReference);
     }
 }

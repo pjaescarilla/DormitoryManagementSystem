@@ -18,6 +18,8 @@ import com.example.dormitorymanagementsystem.classes.activity_classes.PersonalIn
  */
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
+    private BillingFragment thisBillingFragment = new BillingFragment();
+
     @StringRes
     private static final int[] TAB_TITLES = new int[]{R.string.occupant_tab_1, R.string.occupant_tab_2};
     private final Context mContext;
@@ -33,7 +35,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
             case 0:
                 return new PersonalInfoFragment();
             case 1:
-                return new BillingFragment();
+                return thisBillingFragment;
             default:
                 return null;
         }
@@ -49,5 +51,9 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     public int getCount() {
         // Show 2 total pages.
         return TAB_TITLES.length;
+    }
+
+    public BillingFragment getThisBillingFragment() {
+        return thisBillingFragment;
     }
 }
